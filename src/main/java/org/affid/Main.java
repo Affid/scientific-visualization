@@ -140,23 +140,29 @@ public class Main {
             FileWriter writer = new FileWriter("output/database.js");
             FileWriter writer1 = new FileWriter("output/authors.js");
             FileWriter writer2 = new FileWriter("output/spheres.js");
+            FileWriter writer3 = new FileWriter("output/titles.js");
             StringWriter database = new StringWriter();
             StringWriter authors1 = new StringWriter();
             StringWriter spheres1 = new StringWriter();
+            StringWriter titles1 = new StringWriter();
             spheres1.write("export default ");
             authors1.write("export default ");
             database.write("export default ");
+            titles1.write("export default ");
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(database, articles);
             mapper.writeValue(authors1, authors);
             mapper.writeValue(spheres1, spheres);
+            mapper.writeValue(titles1,titles);
             writer.write(database.toString());
             writer1.write(authors1.toString());
             writer2.write(spheres1.toString());
+            writer3.write(titles1.toString());
             writer.close();
             writer1.close();
             writer2.close();
+            writer3.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
