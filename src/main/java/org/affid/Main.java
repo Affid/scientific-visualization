@@ -118,6 +118,7 @@ public class Main {
 
     private static void toJSON(HashMap<String, Article> articles) {
         try {
+            new File("output/").mkdir();
             FileWriter writer = new FileWriter("output/database.js");
             FileWriter writer1 = new FileWriter("output/authors.js");
             FileWriter writer2 = new FileWriter("output/spheres.js");
