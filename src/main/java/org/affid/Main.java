@@ -18,7 +18,6 @@ public class Main {
     static HashMap<String, String> titles = new HashMap<>();
     static HashMap<String, Integer> rate = new HashMap<>();
     static HashMap<String, Sphere> spheres = new HashMap<>();
-    static ArrayList<String> allKeys = new ArrayList<>();
     static ArrayList<Integer> years;
     static ArrayList<Color> colors;
 
@@ -31,28 +30,18 @@ public class Main {
         updateRate(articles);
         cleanNulls(articles);
 
-        //MyGraph.main(String.format("%d;0.002;%d;%d",900,6000,6000).split(";"));
-
-//        fillKeys(articles);
-//
-//        org.affid.Color.addColor("Electric conductance",org.affid.Color.green);
-//        org.affid.Color.addColor("calculation",org.affid.Color.red);
-//        org.affid.Color.addColor("Atomic physics",org.affid.Color.yellow);
-//        org.affid.Color.addColor("Physics",org.affid.Color.black);
-//
         maxRate = Collections.max(rate.values());
 
         years = getYears(articles);
 
         colors = Color.getGradient(Color.orange, Color.sky, years.size());
-//
 
         float C = maxRate*1.2f;
         int size = (int) (Math.log(articles.size()/Math.log(1.05)) * 2.5 * C);
         System.out.println(C);
         System.out.println(size);
         float temperature = 1000;
-//
+
         spheres = generateSpheres(size*0.8f, articles);
 
         ArrayList<Integer> space = new ArrayList<>();
@@ -67,12 +56,10 @@ public class Main {
 
         GraphProcessor gp = new GraphProcessor(vertices.values(), edges, space, C, temperature);
 
-        gp.makeLayout(40);
+        gp.makeLayout(1031);
 
         getCoordinates(vertices);
 
-        //spheresToJSON();
-//
         toJSON(articles);
 
     }
@@ -94,12 +81,6 @@ public class Main {
         Collections.sort(years);
         return years;
     }
-//    private static void replaceSpheres(int times, double k){
-//        for(int i = 0; i < times; i++){
-//            System.out.println(i);
-//            org.affid.SphereOld.replaceSpheres(spheres, k);
-//        }
-//    }
 
     public static void spheresToJSON() {
         try {
@@ -242,16 +223,6 @@ public class Main {
         return citations;
     }
 
-    private static void fillKeys(HashMap<String, Article> articles) {
-        HashSet<String> set = new HashSet<>();
-        for (Map.Entry<String, Article> article : articles.entrySet()) {
-            set.addAll(article.getValue().getKeys());
-        }
-        allKeys.addAll(set);
-        for (String key : allKeys)
-            Color.addColor(key);
-    }
-
     private static String getArticleName(String full) {
         int end = full.indexOf('(');
         if (end == -1)
@@ -281,11 +252,9 @@ public class Main {
                     titles.put(record.get("Название"), record.get("DOI"));
                     rate.put(record.get("DOI"), 0);
                     ArrayList<String> links = getFullCitation(record);
-                    ArrayList<String> keys = new ArrayList<>();
-                    //Collections.addAll(keys,record.get("Ключевые слова указателя").split(";"));
                     articles.put(record.get("DOI"), new Article(author, record.get("Название"),
                             record.get("Год"), 0, record.get("DOI"),
-                            record.get("Ссылка"), links, keys));
+                            record.get("Ссылка"), links));
                 }
             }
             in.close();

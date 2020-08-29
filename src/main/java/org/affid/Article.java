@@ -6,18 +6,13 @@ import java.util.ArrayList;
 
 @JsonPropertyOrder({"authors", "name", "year", "rate", "doi", "link", "refs"})
 public class Article {
-    private ArrayList<Long> authors;
-    private String name;
-    private String year;
+    private final ArrayList<Long> authors;
+    private final String name;
+    private final String year;
     private int rate;
-    private String DOI;
-    private String link;
+    private final String DOI;
+    private final String link;
     private ArrayList<String> refs;
-    private ArrayList<String> keys;
-
-    public ArrayList<String> getKeys() {
-        return keys;
-    }
 
 
     public String getYear() {
@@ -26,8 +21,7 @@ public class Article {
 
     public Article(ArrayList<Long> authors, String name,
                    String year, int rate, String DOI,
-                   String link, ArrayList<String> refs,
-                   ArrayList<String> keys) {
+                   String link, ArrayList<String> refs) {
         this.authors = authors;
         this.name = name;
         this.year = year;
@@ -35,7 +29,6 @@ public class Article {
         this.DOI = DOI;
         this.link = link;
         this.refs = refs;
-        this.keys = keys;
     }
 
     public ArrayList<Long> getAuthors() {

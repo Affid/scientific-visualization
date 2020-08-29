@@ -53,16 +53,17 @@ public class Point implements Coordinate {
 
     @Override
     public Coordinate unit() {
-        if (length() < 0.001)
+        float length = length();
+        if (length == 0)
             return new Point(0.000001f, 0.0000001f, 0.0000001f);
         else
-            return new Point(x / (float) Math.sqrt(x * x + y * y + z * z),
-                    y / (float) Math.sqrt(y * y + x * x + z * z),
-                    z / (float) Math.sqrt(y * y + x * x + z * z));
+            return new Point(x / length, y / length, z / length);
     }
 
     @Override
     public float length() {
+        if ((float) Math.sqrt(y * y + x * x + z * z) == 0)
+            return 0.000000000000000000000000001f;
         return (float) Math.sqrt(y * y + x * x + z * z);
     }
 
