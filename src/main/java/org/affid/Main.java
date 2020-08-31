@@ -24,11 +24,17 @@ public class Main {
     static int maxRate;
 
 
-    public static void main(String[] args) {
-        HashMap<String, org.affid.Article> articles = readCSV("src/main/resources/ScopusDB.csv");
+    public static void main(String[] args) throws FileNotFoundException {
+        PrintStream out = System.out;
+        System.setOut(new PrintStream((new File(args.length > 1 ? args[1] : "output/log1.txt"))));
+        long time1, time2;
+        time1 = System.currentTimeMillis();
+        HashMap<String, org.affid.Article> articles = readCSV(args.length > 0 ? args[0] : "src/main/resources/ScopusDB.csv");
         turnRefsToIds(articles);
         updateRate(articles);
         cleanNulls(articles);
+
+        System.out.println("Число статей: " + articles.size());
 
         maxRate = Collections.max(rate.values());
 
@@ -36,13 +42,14 @@ public class Main {
 
         colors = Color.getGradient(Color.orange, Color.sky, years.size());
 
-        float C = maxRate*1.2f;
-        int size = (int) (Math.log(articles.size()/Math.log(1.05)) * 2.5 * C);
-        System.out.println(C);
-        System.out.println(size);
+        float C = maxRate * 1.2f;
+        int size = (int) (Math.log(articles.size() / Math.log(1.05)) * 2.5 * C);
+        System.out.println("Радиус коэффициент: " + maxRate);
+        System.out.println("Рассчетный размер пространства: " + size + "^3");
         float temperature = 1000;
+        int iterations = args.length > 2 ? Integer.parseInt(args[2]) : 1000;
 
-        spheres = generateSpheres(size*0.8f, articles);
+        spheres = generateSpheres(size * 1f, articles);
 
         ArrayList<Integer> space = new ArrayList<>();
         space.add(size);
@@ -55,46 +62,30 @@ public class Main {
         makeVertices(vertices, edges);
 
         GraphProcessor gp = new GraphProcessor(vertices.values(), edges, space, C, temperature);
-
-        gp.makeLayout(1031);
+        long time12 = System.currentTimeMillis();
+        gp.makeLayout(iterations);
 
         getCoordinates(vertices);
 
+        time2 = System.currentTimeMillis();
+
+        System.out.printf("Обработка заняла %d секунд\n", (time2 - time1) / 1000);
+
+        System.out.printf("На одну итерацию в среднем затрачено %f секунд\n", (float) (time2 - time12) / (iterations * 1000));
+
         toJSON(articles);
 
+        System.setOut(out);
     }
 
-    private static float getAverageRate() {
-        float sum = 0;
-        for (int i : rate.values()) {
-            sum += i;
-        }
-        return sum/rate.size();
-    }
-
-    private static ArrayList<Integer> getYears(HashMap<String,Article> articles){
+    private static ArrayList<Integer> getYears(HashMap<String, Article> articles) {
         Set<Integer> yearsSet = new HashSet<>();
-        for(Map.Entry<String,Article> article: articles.entrySet()){
+        for (Map.Entry<String, Article> article : articles.entrySet()) {
             yearsSet.add(Integer.parseInt(article.getValue().getYear()));
         }
         ArrayList<Integer> years = new ArrayList<>(yearsSet);
         Collections.sort(years);
         return years;
-    }
-
-    public static void spheresToJSON() {
-        try {
-            FileWriter writer2 = new FileWriter("output/spheres.js");
-            StringWriter spheres1 = new StringWriter();
-            spheres1.write("export default ");
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(spheres1, spheres);
-            writer2.write(spheres1.toString());
-            writer2.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private static void makeVertices(HashMap<String, Vertex> vertices, ArrayList<Edge> edges) {
@@ -119,7 +110,7 @@ public class Main {
     private static void toJSON(HashMap<String, Article> articles) {
         try {
             new File("output/").mkdir();
-            FileWriter writer = new FileWriter("output/database.js");
+            FileWriter writer = new FileWriter("output/papers.js");
             FileWriter writer1 = new FileWriter("output/authors.js");
             FileWriter writer2 = new FileWriter("output/spheres.js");
             FileWriter writer3 = new FileWriter("output/titles.js");
@@ -136,7 +127,7 @@ public class Main {
             mapper.writeValue(database, articles);
             mapper.writeValue(authors1, authors);
             mapper.writeValue(spheres1, spheres);
-            mapper.writeValue(titles1,titles);
+            mapper.writeValue(titles1, titles);
             writer.write(database.toString());
             writer1.write(authors1.toString());
             writer2.write(spheres1.toString());
@@ -253,6 +244,7 @@ public class Main {
                     titles.put(record.get("Название"), record.get("DOI"));
                     rate.put(record.get("DOI"), 0);
                     ArrayList<String> links = getFullCitation(record);
+                    links.remove(record.get("Название"));
                     articles.put(record.get("DOI"), new Article(author, record.get("Название"),
                             record.get("Год"), 0, record.get("DOI"),
                             record.get("Ссылка"), links));

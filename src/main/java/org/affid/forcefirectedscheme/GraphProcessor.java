@@ -16,7 +16,6 @@ public class GraphProcessor {
     public GraphProcessor(Collection<Vertex> vertices, Collection<Edge> edges, ArrayList<Integer> space, float C, float temperature) {
         this.temperature = temperature;
         this.k = C * 2.3f;
-        System.out.println(k);
         this.vertices = vertices;
         this.edges = edges;
         this.space = space;
@@ -37,8 +36,6 @@ public class GraphProcessor {
                 }
             }
 
-            System.out.println("---------------------------------");
-
             //вычисление сил притяжения
             for (Edge e : edges) {
                 Coordinate delta = e.getDelta();
@@ -58,8 +55,6 @@ public class GraphProcessor {
 
             //уменьшение температуры по мере приближения к конечному размещению графа
             temperature = cool(temperature);
-
-            System.out.println("TEMPERATURE = " + temperature);
         }
     }
 
